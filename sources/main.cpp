@@ -2,7 +2,7 @@
 #include "../includes/helper.hpp"
 #include "../includes/Server.hpp"
 
-int	main(int argc, char **argv)
+int main(int argc, char **argv)
 {
 	if (argc == 3)
 	{
@@ -15,11 +15,11 @@ int	main(int argc, char **argv)
 		_server->setPassword(argv[2]);
 
 		cout << "Server Port = " << _server->getPort() << endl;
-		cout << "Server Password = " << _server->getPassword() << endl; 
+		cout << "Server Password = " << _server->getPassword() << endl;
 
 		delete _server;
 		return (0);
 	}
-	else 
+	else
 		p_error("Usage: ./ircserv <port> <password>");
 }

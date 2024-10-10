@@ -4,19 +4,19 @@
 
 class Server
 {
-    private:
-        int     _port;
-        string  _password;
-        Server(Server const &copy);
-        Server& operator=(Server const &rhs);
+private:
+	int _port;
+	string _password;
+	Server(Server const &copy);
+	Server &operator=(Server const &rhs);
 
-    public:
-        Server();
-        ~Server();
+public:
+	Server();
+	~Server();
 
-        int     getPort();
-        string  getPassword();
+	int getPort();
+	string getPassword();
 
-        void    setPort(int port);
-        void    setPassword(string password);
+	void setPort(int port);
+	void setPassword(string password);
 };
