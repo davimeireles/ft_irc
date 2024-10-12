@@ -19,4 +19,8 @@ public:
 
 	void setPort(int port);
 	void setPassword(string password);
+
+	void startServerIPV4();
+	void startServerIPV6();
+	void handleErrorConnection();
 };

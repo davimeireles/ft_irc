@@ -6,7 +6,7 @@
 /*   By: dmeirele <dmeirele@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/05 08:31:42 by dmeirele          #+#    #+#             */
-/*   Updated: 2024/10/10 19:15:03 by dmeirele         ###   ########.fr       */
+/*   Updated: 2024/10/12 12:53:47 by dmeirele         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,8 @@
 #include <cctype>
 #include <ranges>
 #include <cstring>
+#include <sys/socket.h>
+#include <fcntl.h>
 
 using std::cout;
 using std::endl;
