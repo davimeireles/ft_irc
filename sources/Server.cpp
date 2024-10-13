@@ -1,12 +1,24 @@
 #include "../includes/Server.hpp"
 
+/**
+ * @brief Construct a new Server:: Server object
+ */
 Server::Server()
 {
-	cout << "Server port and password setted." << endl;
+	cout << GREEN << "Server object created." << RESET << endl;
 }
 
+/**
+ * @brief Destroy the Server:: Server object
+ */
 Server::~Server() {}
 
+/**
+ * @brief Overload of the = operator
+ * 
+ * @param rhs 
+ * @return Server& 
+ */
 Server &Server::operator=(Server const &rhs)
 {
 	_port = rhs._port;
@@ -14,32 +26,62 @@ Server &Server::operator=(Server const &rhs)
 	return (*this);
 }
 
+/**
+ * @brief Copy constructor
+ * 
+ * @param copy 
+ */
 Server::Server(Server const &copy)
 {
 	_port = copy._port;
 	_password = copy._password;
 }
 
+/**
+ * @brief Get the Port object
+ * 
+ * @return int 
+ */
 int Server::getPort()
 {
 	return (_port);
 }
 
+/**
+ * @brief Get the Password object
+ * 
+ * @return string 
+ */
 string Server::getPassword()
 {
 	return (_password);
 }
 
+/**
+ * @brief Set the Port object
+ * 
+ * @param port 
+ */
 void Server::setPort(int port)
 {
 	_port = port;
+	cout << GREEN << "Port set to " << port << "." << RESET << endl;
 }
 
+/**
+ * @brief Set the Password object
+ * 
+ * @param password 
+ */
 void Server::setPassword(string password)
 {
 	_password = password;
+	cout << GREEN << "Password set to " << password << "." << RESET << endl;
 }
 
+/**
+ * @brief Start the server with the IPv4 internet protocol
+ */
 void Server::startServerIPV4()
 {
 	int fd = socket(AF_INET, SOCK_NONBLOCK, 0);
@@ -52,6 +94,9 @@ void Server::startServerIPV4()
 	handleErrorConnection();
 }
 
+/**
+ * @brief Start the server with the IPv6 internet protocol
+ */
 void Server::startServerIPV6()
 {
 	int fd = socket(AF_INET6, SOCK_NONBLOCK, 0);
@@ -64,6 +109,9 @@ void Server::startServerIPV6()
 	handleErrorConnection();
 }
 
+/**
+ * @brief Handle the error connection
+ */
 void Server::handleErrorConnection()
 {
 	int op;
