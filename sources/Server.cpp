@@ -116,20 +116,22 @@ void Server::handleErrorConnection()
 {
 	int op;
 
-	if (errno == EACCES)
-		op = 1;
-	else if (errno == EAFNOSUPPORT)
-		op = 2;
-	else if (errno == EINVAL)
-		op = 3;
-	else if (errno == EMFILE)
-		op = 4;
-	else if (errno == ENFILE)
-		op = 5;
-	else if (errno == ENOBUFS || errno == ENOMEM)
-		op = 6;
-	else if (errno == EPROTONOSUPPORT)
-		op = 7;
+	std::map<int,int>errno_map = {
+		{EACCES, 1},
+		{EAFNOSUPPORT, 2},
+		{EINVAL, 3},
+		{EMFILE, 4},
+		{ENFILE, 5},
+		{ENOBUFS, 6},
+		{ENOMEM, 6},
+		{EPROTONOSUPPORT, 7}
+	};
+
+	std::map<int, int>::iterator it = errno_map.find(errno);
+	if (it != errno_map.end())
+		op = it->second;
+	else
+		op = 0;
 
 	switch (op)
 	{
