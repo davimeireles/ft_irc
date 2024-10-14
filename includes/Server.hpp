@@ -1,6 +1,10 @@
 #pragma once
 
 #include "utils.hpp"
+#include "User.hpp"
+
+class Client;
+class User;
 
 class Server
 {
@@ -9,6 +13,7 @@ private:
 	string _password;
 	Server(Server const &copy);
 	Server &operator=(Server const &rhs);
+	Client *_client;
 
 public:
 	Server();
@@ -23,4 +28,5 @@ public:
 	void startServerIPV4();
 	void startServerIPV6();
 	void handleErrorConnection();
+	void handleClient(int client_fd);
 };

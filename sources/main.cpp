@@ -10,12 +10,12 @@ int main(int argc, char **argv)
 			p_error("Invalid port. Try to use TCP ports 6660–6669, 7000.");
 		if (checkValidPassword(argv[2]) == false)
 			p_error("Password must have 8+ chars & include:\n1+ lowercase\n1+ uppercase\n1+ digit");
-		Server *_server = new Server();
+
+		Server* _server = new Server();
 		_server->setPort(std::atoi(argv[1]));
 		_server->setPassword(argv[2]);
 
-		cout << "Server Port = " << _server->getPort() << endl;
-		cout << "Server Password = " << _server->getPassword() << endl;
+		_server->startServerIPV4();
 
 		delete _server;
 		return (0);

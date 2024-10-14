@@ -1,9 +1,10 @@
 #include "../includes/Server.hpp"
+#include "../includes/Client.hpp"
 
 /**
  * @brief Construct a new Server:: Server object
  */
-Server::Server()
+Server::Server() : _client(new Client())
 {
 	cout << GREEN << "Server object created." << RESET << endl;
 }
@@ -11,7 +12,11 @@ Server::Server()
 /**
  * @brief Destroy the Server:: Server object
  */
-Server::~Server() {}
+Server::~Server() 
+{
+	delete _client;
+	cout << RED << "Server object destroyed." << RESET << endl;
+}
 
 /**
  * @brief Overload of the = operator
@@ -84,14 +89,108 @@ void Server::setPassword(string password)
  */
 void Server::startServerIPV4()
 {
-	int fd = socket(AF_INET, SOCK_NONBLOCK, 0);
+	int fd = socket(AF_INET, SOCK_STREAM, 0);
 
-	if (fd != -1)
+	if (fd == -1)
 	{
-		cout << GREEN << "Server started with IPv4 internet protocol." << RESET << endl;
+		handleErrorConnection();
+		return ;
+	}
+
+	// Set the socket to non-blocking mode
+	int flags = fcntl(fd, F_GETFL, 0);
+	if (flags == -1)
+	{
+		handleErrorConnection();
+		close(fd);
+		return ;
+	}
+
+	if (fcntl(fd, F_SETFL, flags | O_NONBLOCK) == -1)
+	{
+		handleErrorConnection();
+		close(fd);
+		return ;
+	}
+
+	cout << GREEN << "Server started with IPv4 internet protocol." << RESET << endl;
+
+	struct sockaddr_in server_addr;
+	memset(&server_addr, 0, sizeof(server_addr));
+	server_addr.sin_family = AF_INET;
+	server_addr.sin_addr.s_addr = INADDR_ANY;
+	server_addr.sin_port = htons(_port);
+
+	if (bind(fd, (struct sockaddr *)&server_addr, sizeof(server_addr)) < 0)
+	{
+		handleErrorConnection();
 		return;
 	}
-	handleErrorConnection();
+
+	if (listen(fd, 5) < 0)
+	{
+		handleErrorConnection();
+		return ;
+	}
+
+	while (true)
+	{
+		int client_fd = accept(fd, NULL, NULL);
+		_client->setFd(client_fd);
+		if (_client->getFd() < 0)
+		{
+			if (errno == EWOULDBLOCK || errno == EAGAIN)
+				continue;
+			else
+			{
+				handleErrorConnection();
+				continue ;
+			}
+		}
+		cout << GREEN << "Client connected." << RESET << endl;
+		handleClient(_client->getFd());
+	}
+	close (fd);
+}
+
+void Server::handleClient(int client_fd)
+{
+	char buffer[1024];
+	while (true)
+	{
+		ssize_t bytes_read = read(client_fd, buffer, sizeof(buffer) - 1);
+		_client->setInfo(buffer);
+		
+		/**
+		 * TODO: Parse the first buffer iteration.
+		 * TODO: e.g. Received: CAP LS 302
+		 * TODO: PASS Davi282108
+		 * TODO: NICK quisk
+		 * TODO: USER dmeireles 0 * :Davi
+		 */
+		
+		if (bytes_read > 0)
+		{
+			buffer[bytes_read] = '\0';
+			cout << ORANGE << "Received: " << buffer << RESET << endl;
+		}
+		else if (bytes_read == 0)
+		{
+			cout << "Client disconnected." << endl;
+			break ;
+		}
+		else
+		{
+			if (errno == EWOULDBLOCK || errno == EAGAIN)
+				continue;
+			else
+			{
+				handleErrorConnection();
+				break;
+			}
+		}
+	}
+	close(client_fd);
 }
 
 /**
@@ -116,16 +215,16 @@ void Server::handleErrorConnection()
 {
 	int op;
 
-	std::map<int,int>errno_map = {
-		{EACCES, 1},
-		{EAFNOSUPPORT, 2},
-		{EINVAL, 3},
-		{EMFILE, 4},
-		{ENFILE, 5},
-		{ENOBUFS, 6},
-		{ENOMEM, 6},
-		{EPROTONOSUPPORT, 7}
-	};
+	std::map<int,int>errno_map;
+
+	errno_map[EACCES] = 1;
+	errno_map[EAFNOSUPPORT] = 2;
+	errno_map[EINVAL] = 3;
+	errno_map[EMFILE] = 4;
+	errno_map[ENFILE] = 5;
+	errno_map[ENOBUFS] = 6;
+	errno_map[ENOMEM] = 6;
+	errno_map[EPROTONOSUPPORT] = 7;
 
 	std::map<int, int>::iterator it = errno_map.find(errno);
 	if (it != errno_map.end())

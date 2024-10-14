@@ -9,7 +9,9 @@ OBJECTS_DIRECTORY = objects
 NAME = ircserv
 
 FILES = main.cpp helper.cpp \
-		Server.cpp
+		Server.cpp \
+		Client.cpp \
+		User.cpp
 
 OBJECTS = $(addprefix $(OBJECTS_DIRECTORY)/, $(FILES:.cpp=.o))
 

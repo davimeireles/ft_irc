@@ -13,6 +13,8 @@
 #pragma once
 
 #include <iostream>
+#include <unistd.h>
+#include <netinet/in.h>
 #include <cstdlib>
 #include <iomanip>
 #include <climits>
@@ -30,6 +32,7 @@
 #include <cstring>
 #include <sys/socket.h>
 #include <fcntl.h>
+#include <errno.h>
 
 using std::cout;
 using std::endl;
