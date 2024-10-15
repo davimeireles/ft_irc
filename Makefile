@@ -1,8 +1,9 @@
 #	====================		Directories		====================
-
-SOURCES = sources
+FOLDER = sources
+_SUBFOLDERS = Client Server User Utils
 HEADERS = includes
 OBJECTS_DIRECTORY = objects
+VPATH = $(FOLDER) $(addprefix $(FOLDER)/, $(_SUBFOLDERS))
 
 #	====================		Files      		====================
 
@@ -13,7 +14,7 @@ FILES = main.cpp helper.cpp \
 		Client.cpp \
 		User.cpp
 
-OBJECTS = $(addprefix $(OBJECTS_DIRECTORY)/, $(FILES:.cpp=.o))
+OBJECTS = $(addprefix $(OBJECTS_DIRECTORY)/, $(FILES:%.cpp=%.o))
 
 #	====================		Flags      		====================
 
@@ -54,7 +55,7 @@ $(NAME): $(OBJECTS_DIRECTORY) $(OBJECTS)
 	@echo "[$(CYAN)Executable$(RESET)] $(GREEN)$(NAME)$(RESET)"
 	@$(COMPILER) $(FLAGS) $(OBJECTS) -o $(NAME)
 
-$(OBJECTS_DIRECTORY)/%.o: $(SOURCES)/%.cpp
+$(OBJECTS_DIRECTORY)/%.o: %.cpp
 	@echo "[$(CYAN)Compiling$(RESET)] $(FLAGS) $(GREEN)$<$(RESET)"
 	@$(COMPILER) $(FLAGS) $(I) -c $< -o $@
 

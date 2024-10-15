@@ -33,6 +33,7 @@
 #include <sys/socket.h>
 #include <fcntl.h>
 #include <errno.h>
+#include <sys/select.h>
 
 using std::cout;
 using std::endl;

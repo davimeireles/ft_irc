@@ -1,3 +1,6 @@
+reference to make : https://modern.ircdocs.horse/
+
+
 Your executable will be run as follows: ./ircserv <port> <password> ✅
 
 You mustn’t develop a client. ✅

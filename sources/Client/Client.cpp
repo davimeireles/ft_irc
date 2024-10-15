@@ -1,5 +1,5 @@
-#include "../includes/Client.hpp"
-#include "../includes/Server.hpp"
+#include "../../includes/Client.hpp"
+#include "../../includes/Server.hpp"
 
 /**
  * @brief Construct a new Client:: Client object
@@ -96,4 +96,41 @@ User *Client::getUser()
 void Client::setUser(User *user)
 {
 	_user = user;
+}
+
+void Client::handleDataFromClient(int client_fd)
+{
+	char buffer[1024];
+
+	while (true)
+	{
+		ssize_t bytes_read = read(client_fd, buffer, sizeof(buffer) - 1);
+	
+		if (bytes_read > 0)
+		{
+			this->setInfo(buffer);
+			buffer[bytes_read] = '\0';
+			ssize_t bytes_sent = send(client_fd, buffer, bytes_read, 0);
+			cout << ORANGE << "Received: " << buffer << RESET << endl;
+			if (bytes_sent < 0)
+				cout << RED << "Failed to send data to client." << RESET << endl;
+			cout << ORANGE << "Sent: " << bytes_sent << RESET << endl;
+		}
+		else if (bytes_read == 0)
+		{
+			cout << "Client disconnected." << endl;
+			break ;
+		}
+		else
+		{
+			if (errno == EWOULDBLOCK || errno == EAGAIN)
+				continue;
+			else
+			{
+				handleErrorConnection();
+				break;
+			}
+		}
+	}
+	close(client_fd);
 }

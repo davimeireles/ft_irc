@@ -31,3 +31,9 @@ void p_error(string error);
  * @return false
  */
 bool checkValidPassword(string password);
+
+/**
+ * @brief Handle the error connection.
+ * 
+ */
+void handleErrorConnection();

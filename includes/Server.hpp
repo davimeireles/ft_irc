@@ -1,6 +1,7 @@
 #pragma once
 
 #include "utils.hpp"
+#include "helper.hpp"
 #include "User.hpp"
 
 class Client;
@@ -27,6 +28,4 @@ public:
 
 	void startServerIPV4();
 	void startServerIPV6();
-	void handleErrorConnection();
-	void handleClient(int client_fd);
 };

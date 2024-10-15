@@ -1,6 +1,7 @@
 #pragma once
 
 #include "utils.hpp"
+#include "helper.hpp"
 #include "User.hpp"
 
 class User;
@@ -19,8 +20,12 @@ class Client
 
 		int getFd();
 		string getInfo();
+
 		void setFd(int fd);
 		void setInfo(string info);
-		void setUser(User *user);
+
 		User *getUser();
+		void setUser(User *user);
+
+		void handleDataFromClient(int client_fd);
 };
