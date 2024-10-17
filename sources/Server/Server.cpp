@@ -1,12 +1,23 @@
 #include "../../includes/Client.hpp"
 #include "../../includes/Server.hpp"
 
-
 /**
  * @brief Construct a new Server:: Server object
  */
-Server::Server() : _client(new Client())
+Server::Server(int port, string password)
 {
+	this->_port = port;
+	this->_password = password;
+	this->max_clients_limit = 5;
+	
+	this->_server_sockIPV4.sin_family = AF_INET;
+	this->_server_sockIPV4.sin_addr.s_addr = INADDR_ANY;
+	this->_server_sockIPV4.sin_port = htons(_port);
+
+	this->_server_sockIPV6.sin6_family = AF_INET6;
+	this->_server_sockIPV6.sin6_addr = in6addr_any;
+	this->_server_sockIPV6.sin6_port = htons(_port);
+
 	cout << GREEN << "Server object created." << RESET << endl;
 }
 
@@ -15,7 +26,6 @@ Server::Server() : _client(new Client())
  */
 Server::~Server() 
 {
-	delete _client;
 	cout << RED << "Server object destroyed." << RESET << endl;
 }
 
@@ -97,48 +107,39 @@ void Server::startServerIPV4()
 		handleErrorConnection();
 		return ;
 	}
+	cout << GREEN << "socket() is OK!" << endl;
 
-	// Set the socket to non-blocking mode
+
 	int flags = fcntl(fd, F_GETFL, 0);
-	if (flags == -1)
-	{
+	if (flags == -1) {
 		handleErrorConnection();
-		close(fd);
-		return ;
+		return;
 	}
-
-	if (fcntl(fd, F_SETFL, flags | O_NONBLOCK) == -1)
-	{
-		handleErrorConnection();
-		close(fd);
-		return ;
-	}
-
-	cout << GREEN << "Server started with IPv4 internet protocol." << RESET << endl;
-
-	struct sockaddr_in server_addr;
-	memset(&server_addr, 0, sizeof(server_addr));
-	server_addr.sin_family = AF_INET;
-	server_addr.sin_addr.s_addr = INADDR_ANY;
-	server_addr.sin_port = htons(_port);
-
-	if (bind(fd, (struct sockaddr *)&server_addr, sizeof(server_addr)) < 0)
-	{
+	if (fcntl(fd, F_SETFL, flags | O_NONBLOCK) == -1) {
 		handleErrorConnection();
 		return;
 	}
 
-	if (listen(fd, 5) < 0)
+	if (bind(fd, (struct sockaddr *)&_server_sockIPV4, sizeof(_server_sockIPV4)) != 0)
 	{
 		handleErrorConnection();
 		return ;
 	}
 
+	cout << GREEN << "bind() is OK!" << endl;
+
+	if (listen(fd, max_clients_limit) < 0)
+	{
+		handleErrorConnection();
+		return ;
+	}
+
+	cout << GREEN << "listen() is OK, and waiting for connections..." << endl;
+
 	while (true)
 	{
 		int client_fd = accept(fd, NULL, NULL);
-		_client->setFd(client_fd);
-		if (_client->getFd() < 0)
+		if (client_fd < 0)
 		{
 			if (errno == EWOULDBLOCK || errno == EAGAIN)
 				continue;
@@ -148,12 +149,32 @@ void Server::startServerIPV4()
 				continue ;
 			}
 		}
-		cout << GREEN << "Client connected." << RESET << endl;
-		_client->handleDataFromClient(_client->getFd());
+		cout << GREEN << "Client trying to connect." << RESET << endl;
+		if (!addClient(client_fd))
+		{
+			/**
+			 * TODO: This loop just work for accept fds inside the server, now need to make the clients to do something inside the server and keep testing, but need to know how to do that with that loop working
+			 * 
+			 */
+			std::cerr << RED << "Reached the limit of clients inside the server." << RESET << endl;
+			continue ;
+		}
 	}
 	close (fd);
 }
 
+bool  Server::addClient(int fd)
+{
+	static int index = 0;
+	if (_clients.size() >= max_clients_limit)
+	{
+		close(fd);
+		return (false);
+	}
+	Client* new_client = new Client(fd);
+	_clients[index++] = new_client;
+	return (true);
+}
 
 /**
  * @brief Start the server with the IPv6 internet protocol

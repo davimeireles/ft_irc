@@ -11,10 +11,7 @@ int main(int argc, char **argv)
 		if (checkValidPassword(argv[2]) == false)
 			p_error("Password must have 8+ chars & include:\n1+ lowercase\n1+ uppercase\n1+ digit");
 
-		Server* _server = new Server();
-		_server->setPort(std::atoi(argv[1]));
-		_server->setPassword(argv[2]);
-
+		Server* _server = new Server(std::atoi(argv[1]), argv[2]);
 		_server->startServerIPV4();
 
 		delete _server;
